@@ -1,5 +1,13 @@
 package org.todo_voodoo.infrastructure.adapters.out.persistance;
 
-public class PostgresTaskRepository
+import org.todo_voodoo.domain.model.Task;
+import org.todo_voodoo.domain.ports.out.TaskRepository;
+
+public class PostgresTaskRepository implements TaskRepository
 {
+    @Override
+    public void save(Task task)
+    {
+        // PostgreSQL specific code
+    }
 }

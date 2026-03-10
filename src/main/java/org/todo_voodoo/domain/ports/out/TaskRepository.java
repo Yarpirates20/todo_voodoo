@@ -1,5 +1,8 @@
 package org.todo_voodoo.domain.ports.out;
 
-public class TaskRepository
+import org.todo_voodoo.domain.model.Task;
+
+public interface TaskRepository
 {
+    void save(Task task);
 }
