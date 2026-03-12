@@ -1,13 +1,14 @@
 package org.todo_voodoo.domain.model;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Task is a Domain Model representing a To-Do list item.
  */
 public class Task
 {
-    private String id;
+    private UUID id;
     private String title;
     private String description;
     private String dueDate;        // YYYY-MM-DD
@@ -26,7 +27,7 @@ public class Task
      * @param categoryId  ID of category of task.
      * @param isCompleted Boolean determining if task is active or finished.
      */
-    public Task(String id, String title, String description, String dueDate, int categoryId, boolean isCompleted)
+    public Task(UUID id, String title, String description, String dueDate, int categoryId, boolean isCompleted)
     {
         if (title == null || title.isBlank())
         {
@@ -48,7 +49,7 @@ public class Task
      */
     public Task(String title)
     {
-        this(java.util.UUID.randomUUID().toString(), title, null, null, 1, false);
+        this(java.util.UUID.randomUUID(), title, null, null, 1, false);
     }
 
     /**
