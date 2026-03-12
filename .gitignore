@@ -13,6 +13,7 @@ target/
 *.iml
 *.ipr
 
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -37,3 +38,15 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Environments and Secrets ###
+.env
+*.log
+
+### IDE ###
+.idea/
+out/
+gen/
+/.github/
+.mvn/
+/.idea/

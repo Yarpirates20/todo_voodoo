@@ -1,8 +1,8 @@
 package org.todo_voodoo.domain.service;
 
 import org.todo_voodoo.domain.model.Task;
-import org.todo_voodoo.domain.ports.in.TaskUseCase;
 import org.todo_voodoo.domain.ports.out.TaskRepository;
+import org.todo_voodoo.domain.ports.in.TaskUseCase;
 
 public class TaskService implements TaskUseCase
 {
