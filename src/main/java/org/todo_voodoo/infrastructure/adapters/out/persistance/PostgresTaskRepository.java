@@ -6,8 +6,8 @@ import org.todo_voodoo.domain.ports.out.TaskRepository;
 public class PostgresTaskRepository implements TaskRepository
 {
     @Override
-    public void save(Task task)
+    public Task save(Task task)
     {
-        // PostgreSQL specific code
+        return null;
     }
 }

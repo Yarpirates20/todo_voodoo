@@ -1,52 +1,32 @@
+# Build artifacts
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.kotlin
+out/
+gen/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+# Maven Wrapper - KEEP THESE
+!/.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Secrets and Logs
+.env
+*.log
+.DS_Store
+
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
+# Shared Team Settings - UN-IGNORE
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/vcs.xml
+!.idea/modules.xml
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Ensure workspace (personal settings) is always ignored
+.idea/workspace.xml
+.idea/usage.statistics.xml
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
-.DS_Store
-
-### Environments and Secrets ###
-.env
-*.log
-
-### IDE ###
-.idea/
-out/
-gen/
-/.github/
-.mvn/
-/.idea/
+### Github ###
+.github/copilot-instructions.md
