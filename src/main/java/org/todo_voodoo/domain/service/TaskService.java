@@ -43,10 +43,19 @@ public class TaskService implements TaskUseCase
 
     }
 
+    /**
+     * Updates existing task description.
+     *
+     * @param id UUID of task to update.
+     * @param newDescription The new description string.
+     * @return The task with updated description.
+     */
     @Override
     public Task updateDescription(UUID id, String newDescription)
     {
-        return null;
+        Task task = getTaskById(id);
+        task.updateDescription(newDescription);
+        return repository.save(task);
     }
 
     @Override
@@ -55,17 +64,29 @@ public class TaskService implements TaskUseCase
         return null;
     }
 
+    /**
+     * Uses repository to find task and change its category, then saves back to repository.
+     *
+     * @param id         UUID of task to reclassify.
+     * @param categoryId The new category ID.
+     * @return The task with updated category.
+     */
     @Override
     public Task reclassifyTask(UUID id, int categoryId)
     {
-        return null;
+        Task task = getTaskById(id);
+
+        task.updateCategory(categoryId);
+
+        return repository.save(task);
+
     }
 
     /**
      * Uses the repository to find task and changes it using domain model's logic before saving
      * it back to repository.
      *
-     * @param id UUID of task to update.
+     * @param id       UUID of task to update.
      * @param newTitle The new title string.
      * @return The renamed task.
      */
@@ -82,10 +103,15 @@ public class TaskService implements TaskUseCase
         return repository.save(task);
     }
 
+
+    /**
+     * Acts as passthrough handling request from inbound port reaches data layer.
+     * @return A List of all Tasks in data source.
+     */
     @Override
     public List<Task> getAllTasks()
     {
-        return List.of();
+        return repository.findAll();
     }
 
     /**
