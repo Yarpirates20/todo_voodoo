@@ -1,21 +1,23 @@
 package org.todo_voodoo;
 
 
+import org.todo_voodoo.domain.ports.in.TaskUseCase;
+import org.todo_voodoo.domain.ports.out.TaskRepository;
 import org.todo_voodoo.domain.service.TaskService;
-import org.todo_voodoo.infrastructure.adapters.in.console.TaskCLIAdapter;
-import org.todo_voodoo.infrastructure.adapters.out.persistance.PostgresTaskRepository;
+import org.todo_voodoo.infrastructure.adapters.out.persistance.InMemoryTaskRepository;
 
 public class Main
 {
     public static void main(String[] args)
     {
-        // Initialize storage (Outbound Adaptor)
-        var repository = new PostgresTaskRepository();
+        // Create the tool (Adapter)
+        TaskRepository taskRepo = new InMemoryTaskRepository();
 
-        // Initialize logic (Domain Service)
-        var taskService = new TaskService(repository);
+        // Create brain (Service) and give it the Tool
+        TaskUseCase taskService = new TaskService(taskRepo);
 
-        // Initialize CLI (Inbound Adaptor)
+        // Use the Service
+        taskService.createTask("Start my Stats homework");
 
 
     }
