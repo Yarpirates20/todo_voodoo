@@ -37,10 +37,20 @@ public class TaskService implements TaskUseCase
         return savedTask;
     }
 
+    /**
+     * Uses the TaskService getTaskById to ensure there is a task to delete, then deletes task
+     * from repository.
+     *
+     * If no task with that UUID exists, throws exception.
+     *
+     * @param id UUID of task to delete.
+     */
     @Override
     public void deleteTask(UUID id)
     {
+         getTaskById(id);
 
+         repository.deleteById(id);
     }
 
     /**
@@ -58,10 +68,19 @@ public class TaskService implements TaskUseCase
         return repository.save(task);
     }
 
+    /**
+     * Postpones a task by changing its due date.
+     *
+     * @param id      UUID of task to postpone.
+     * @param newDate The new due date string.
+     * @return Task with updated due date.
+     */
     @Override
     public Task postponeTask(UUID id, String newDate)
     {
-        return null;
+        Task task = getTaskById(id);
+        task.updateDueDate(newDate);
+        return repository.save(task);
     }
 
     /**
@@ -118,7 +137,7 @@ public class TaskService implements TaskUseCase
      * Pulls task from repository into memory.
      *
      * @param id UUID of task to fetch.
-     * @return
+     * @return Task if exists or else throws exception.
      */
     @Override
     public Task getTaskById(UUID id)
@@ -127,15 +146,38 @@ public class TaskService implements TaskUseCase
 
     }
 
+    /**
+     * Toggles task status to completed.
+     *
+     * @param id UUID of task to complete.
+     * @return Updated task marked completed.
+     */
     @Override
     public Task completeTask(UUID id)
     {
-        return null;
+        Task task = getTaskById(id);
+
+        task.complete();
+
+        return repository.save(task);
+
     }
 
+    /**
+     * Toggles task uncompleted.
+     *
+     * @param id UUID of task to mark uncompleted.
+     * @return Task marked as uncompleted.
+     */
     @Override
     public Task uncompleteTask(UUID id)
     {
-        return null;
+
+        Task task = getTaskById(id);
+
+        task.reopen();
+
+        return  repository.save(task);
+
     }
 }
