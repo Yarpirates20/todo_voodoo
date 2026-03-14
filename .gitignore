@@ -1,6 +1,6 @@
 # Build artifacts
 target/
-out/
+#out/
 gen/
 
 # Maven Wrapper - KEEP THESE

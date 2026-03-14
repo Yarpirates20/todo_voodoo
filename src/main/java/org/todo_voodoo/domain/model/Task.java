@@ -103,6 +103,16 @@ public class Task
     }
 
     /**
+     * Get task ID.
+     *
+     * @return Task ID.
+     */
+    public UUID getId()
+    {
+        return id;
+    }
+
+    /**
      * Mark Task as completed.
      */
     public void complete()
