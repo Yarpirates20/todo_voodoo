@@ -8,36 +8,46 @@ import org.todo_voodoo.domain.ports.in.TaskUseCase;
 import org.todo_voodoo.infrastructure.adapters.in.console.TaskCLIAdapter;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TaskCLIAdapterTest
 {
     private FakeTaskUseCase fakeUseCase;
     private TaskCLIAdapter adapter;
     private java.io.InputStream originalIn;
+    private java.io.PrintStream originalOut;
 
     @BeforeEach
     void setUp()
     {
         fakeUseCase = new FakeTaskUseCase();
         originalIn = System.in;
+        originalOut = System.out;
     }
 
     @AfterEach
     void tearDown()
     {
         System.setIn(originalIn);
+        System.setOut(originalOut);
     }
 
     @Test
-    void run_renameCommand_callsRenameWithExpectedValues()
+    void runRenameCommandCallsRenameWithExpectedValues()
     {
         Task seeded = fakeUseCase.seedTask("Old title");
-        String input = String.join(System.lineSeparator(), "4", seeded.getId().toString(), "New " +
-                "title", "0") + System.lineSeparator();
+        String input = String.join(System.lineSeparator(),
+                "4",
+                seeded.getId().toString(),
+                "New " +
+                        "title",
+                "0") + System.lineSeparator();
 
         System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 
@@ -51,11 +61,54 @@ class TaskCLIAdapterTest
         assertEquals("New title", fakeUseCase.getTaskById(seeded.getId()).getTitle());
     }
 
+    @Test
+    void runViewAllTasksPrintsTasksWhenTaskExists()
+    {
+        Task t1 = fakeUseCase.seedTask("First task");
+        Task t2 = fakeUseCase.seedTask("Second task");
+
+        String input = String.join(System.lineSeparator(), "1", "0") + System.lineSeparator();
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        String output = out.toString(StandardCharsets.UTF_8);
+
+        assertTrue(output.contains(t1.getTitle()));
+        assertTrue(output.contains(t2.getTitle()));
+        assertEquals(1,fakeUseCase.getGetAllTasksCalls());
+    }
+
+    @Test
+    void runViewAllTasksPrintsEmptyMessageWhenNoTasks()
+    {
+        String input = String.join(System.lineSeparator(),"1", "0") + System.lineSeparator();
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        System.setOut(new PrintStream(out));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        String output = out.toString(StandardCharsets.UTF_8);
+
+        assertTrue(output.contains("There are no tasks available."));
+        assertEquals(1, fakeUseCase.getGetAllTasksCalls());
+    }
+
     static class FakeTaskUseCase implements TaskUseCase
     {
         private final Map<UUID, Task> storage = new HashMap<>();
 
         private int renameTaskCalls = 0;
+        private int getAllTasksCalls = 0;
+
         private UUID lastRenameId;
         private String lastRenameTitle;
 
@@ -80,7 +133,6 @@ class TaskCLIAdapterTest
         {
             return lastRenameTitle;
         }
-
 
 
         @Override
@@ -114,9 +166,15 @@ class TaskCLIAdapterTest
             return task;
         }
 
+        int getGetAllTasksCalls()
+        {
+            return getAllTasksCalls;
+        }
+
         @Override
         public List<Task> getAllTasks()
         {
+            getAllTasksCalls++;
             return List.copyOf(storage.values());
         }
 

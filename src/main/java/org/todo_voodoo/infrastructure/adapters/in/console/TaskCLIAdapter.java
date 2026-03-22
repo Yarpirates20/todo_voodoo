@@ -1,7 +1,9 @@
 package org.todo_voodoo.infrastructure.adapters.in.console;
 
+import org.todo_voodoo.domain.model.Task;
 import org.todo_voodoo.domain.ports.in.TaskUseCase;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -60,9 +62,9 @@ public class TaskCLIAdapter
     {
         switch (command)
         {
-//            case 1:
-//                handleGetAllTasks();
-//                break;
+            case 1:
+                handleGetAllTasks();
+                break;
 //            case 2:
 //                handleCreateTask();
 //                break;
@@ -85,6 +87,23 @@ public class TaskCLIAdapter
     }
 
     /**
+     * Retrieves all available tasks.
+     */
+    private void handleGetAllTasks()
+    {
+        List<Task> allTasks = taskService.getAllTasks();
+
+        if (allTasks.isEmpty())
+        {
+            System.out.println("There are no tasks available.");
+        }
+        else
+        {
+            allTasks.forEach(task -> System.out.println(task));
+        }
+    }
+
+    /**
      * Gathers necessary data from user using Scanner and passes that on to
      * taskService.
      */
@@ -95,7 +114,7 @@ public class TaskCLIAdapter
         UUID id = UUID.fromString(idInput);
 
         System.out.print("Enter the new title: ");
-        String newTitle  = scanner.nextLine();
+        String newTitle = scanner.nextLine();
 
         // Call service to perform logic
         taskService.renameTask(id, newTitle);
