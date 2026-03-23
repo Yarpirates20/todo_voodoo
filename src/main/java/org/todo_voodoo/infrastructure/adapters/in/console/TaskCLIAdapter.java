@@ -74,9 +74,9 @@ public class TaskCLIAdapter
             case 4:
                 handleRenameTask();
                 break;
-//            case 5:
-//                handlePostponeTask();
-//                break;
+            case 5:
+                handlePostponeTask();
+                break;
 //            case 6:
 //                handle deleteTask();
 //                break;
@@ -84,6 +84,31 @@ public class TaskCLIAdapter
                 System.out.println("Invalid command");
                 break;
         }
+    }
+
+    /**
+     * Retrieves new date and UUID from user and changes the task due date.
+     */
+    private void handlePostponeTask()
+    {
+        System.out.println("Enter the UUID of the task to postpone: ");
+        String idInput = scanner.nextLine();
+        UUID id = UUID.fromString(idInput);
+
+        System.out.println("Enter the new due date month (MM): ");
+        String month = scanner.nextLine();
+
+        System.out.println("Enter the new due date day (DD): ");
+        String day = scanner.nextLine();
+
+        System.out.println("Enter the new due date year (YYYY): ");
+        String year = scanner.nextLine();
+
+        StringBuilder newDate = new StringBuilder(year);
+        newDate.append("-").append(month).append("-").append(day);
+
+
+        taskService.postponeTask(id, newDate.toString());
     }
 
     /**

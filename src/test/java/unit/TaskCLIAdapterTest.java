@@ -150,6 +150,29 @@ class TaskCLIAdapterTest
         assertTrue(output.contains("Task marked completed"));
     }
 
+    @Test
+    void runPostponeTaskCallsPostponeTaskWithExpectedValues()
+    {
+        Task seeded = fakeUseCase.seedTask("Submit report");
+
+        String input = String.join(System.lineSeparator(),
+                "5",
+                seeded.getId().toString(),
+                "12",
+                "31",
+                "2026",
+                "0") + System.lineSeparator();
+
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        assertEquals(1, fakeUseCase.getPostponeTaskCalls());
+        assertEquals(seeded.getId(), fakeUseCase.getLastPostponedTaskId());
+        assertEquals("2026-12-31", fakeUseCase.getLastPostponedDate());
+        assertEquals("2026-12-31", fakeUseCase.getTaskById(seeded.getId()).getDueDate());
+    }
 
     static class FakeTaskUseCase implements TaskUseCase
     {
@@ -167,11 +190,30 @@ class TaskCLIAdapterTest
         private int completeTaskCalls = 0;
         private UUID lastCompletedTaskId;
 
+        private int postponeTaskCalls = 0;
+        private UUID lastPostponedTaskId;
+        private String lastPostponedDate;
+
         Task seedTask(String title)
         {
             Task task = new Task(title);
             storage.put(task.getId(), task);
             return task;
+        }
+
+        int getPostponeTaskCalls()
+        {
+            return postponeTaskCalls;
+        }
+
+        public UUID getLastPostponedTaskId()
+        {
+            return lastPostponedTaskId;
+        }
+
+        public String getLastPostponedDate()
+        {
+            return lastPostponedDate;
         }
 
         int getCompleteTaskCalls()
@@ -288,7 +330,19 @@ class TaskCLIAdapterTest
         @Override
         public Task postponeTask(UUID id, String newDate)
         {
-            throw new UnsupportedOperationException("Not needed in this test");
+            postponeTaskCalls++;
+            lastPostponedTaskId = id;
+            lastPostponedDate = newDate;
+
+            Task task = storage.get(id);
+
+            if (task == null)
+            {
+                throw new IllegalArgumentException("No task found with id: " + id);
+            }
+
+            task.updateDueDate(newDate);
+            return task;
         }
 
         @Override
