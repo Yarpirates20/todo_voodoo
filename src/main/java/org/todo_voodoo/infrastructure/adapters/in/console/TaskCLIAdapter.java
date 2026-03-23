@@ -68,9 +68,9 @@ public class TaskCLIAdapter
             case 2:
                 handleCreateTask();
                 break;
-//            case 3:
-//                handleCompleteTask();
-//                break;
+            case 3:
+                handleCompleteTask();
+                break;
             case 4:
                 handleRenameTask();
                 break;
@@ -84,6 +84,20 @@ public class TaskCLIAdapter
                 System.out.println("Invalid command");
                 break;
         }
+    }
+
+    /**
+     * Retrieves UUID from user and passes on to
+     * task service to mark task completed.
+     */
+    private void handleCompleteTask()
+    {
+        System.out.println("Enter the UUID of the task to rename: ");
+        String idInput = scanner.nextLine();
+        UUID id = UUID.fromString(idInput);
+
+        taskService.completeTask(id);
+        System.out.println("Task marked completed.");
     }
 
     /**

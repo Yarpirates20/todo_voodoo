@@ -126,6 +126,31 @@ class TaskCLIAdapterTest
         assertTrue(output.contains("New task successfully created."));
     }
 
+    @Test
+    void runCompleteTaskCallsCompleteTaskAndPrintSuccessMessage()
+    {
+        Task seeded = fakeUseCase.seedTask("Pay bills");
+
+        String input =
+                String.join(System.lineSeparator(),"3", seeded.getId().toString(),"0") + System.lineSeparator();
+
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        String output = out.toString(StandardCharsets.UTF_8);
+
+        assertEquals(1, fakeUseCase.getCompleteTaskCalls());
+        assertEquals(seeded.getId(), fakeUseCase.getLastCompletedTaskId());
+        assertTrue(fakeUseCase.getTaskById(seeded.getId()).getIsCompleted());
+        assertTrue(output.contains("Task marked completed"));
+    }
+
+
     static class FakeTaskUseCase implements TaskUseCase
     {
         private final Map<UUID, Task> storage = new HashMap<>();
@@ -139,11 +164,24 @@ class TaskCLIAdapterTest
         private  int createTaskCalls = 0;
         private String lastCreatedTitle;
 
+        private int completeTaskCalls = 0;
+        private UUID lastCompletedTaskId;
+
         Task seedTask(String title)
         {
             Task task = new Task(title);
             storage.put(task.getId(), task);
             return task;
+        }
+
+        int getCompleteTaskCalls()
+        {
+            return completeTaskCalls;
+        }
+
+        UUID getLastCompletedTaskId()
+        {
+            return lastCompletedTaskId;
         }
 
         int getRenameTaskCalls()
@@ -263,7 +301,18 @@ class TaskCLIAdapterTest
         @Override
         public Task completeTask(UUID id)
         {
-            throw new UnsupportedOperationException("Not needed in this test");
+            completeTaskCalls++;
+            lastCompletedTaskId = id;
+
+            Task task = storage.get(id);
+
+            if (task == null)
+            {
+                throw new IllegalArgumentException("No task found with id: " + id);
+            }
+
+            task.complete();
+            return task;
         }
 
         @Override
