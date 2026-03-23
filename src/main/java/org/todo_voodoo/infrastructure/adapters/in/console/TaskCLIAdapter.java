@@ -65,9 +65,9 @@ public class TaskCLIAdapter
             case 1:
                 handleGetAllTasks();
                 break;
-//            case 2:
-//                handleCreateTask();
-//                break;
+            case 2:
+                handleCreateTask();
+                break;
 //            case 3:
 //                handleCompleteTask();
 //                break;
@@ -87,6 +87,19 @@ public class TaskCLIAdapter
     }
 
     /**
+     * Get task title and info from user and pass on to
+     * task service.
+     */
+    private void handleCreateTask()
+    {
+        System.out.println("Enter the task title: ");
+        String titleInput = scanner.nextLine();
+
+        taskService.createTask(titleInput);
+        System.out.println("New task successfully created.");
+    }
+
+    /**
      * Retrieves all available tasks.
      */
     private void handleGetAllTasks()
@@ -96,8 +109,7 @@ public class TaskCLIAdapter
         if (allTasks.isEmpty())
         {
             System.out.println("There are no tasks available.");
-        }
-        else
+        } else
         {
             allTasks.forEach(task -> System.out.println(task));
         }

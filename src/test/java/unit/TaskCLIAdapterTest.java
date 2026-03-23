@@ -23,6 +23,7 @@ class TaskCLIAdapterTest
     private java.io.InputStream originalIn;
     private java.io.PrintStream originalOut;
 
+
     @BeforeEach
     void setUp()
     {
@@ -80,13 +81,13 @@ class TaskCLIAdapterTest
 
         assertTrue(output.contains(t1.getTitle()));
         assertTrue(output.contains(t2.getTitle()));
-        assertEquals(1,fakeUseCase.getGetAllTasksCalls());
+        assertEquals(1, fakeUseCase.getGetAllTasksCalls());
     }
 
     @Test
     void runViewAllTasksPrintsEmptyMessageWhenNoTasks()
     {
-        String input = String.join(System.lineSeparator(),"1", "0") + System.lineSeparator();
+        String input = String.join(System.lineSeparator(), "1", "0") + System.lineSeparator();
         System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -102,6 +103,29 @@ class TaskCLIAdapterTest
         assertEquals(1, fakeUseCase.getGetAllTasksCalls());
     }
 
+    @Test
+    void runCreateTaskCallsCreateTaskAndPrintsSuccessMessage()
+    {
+        String input =
+                String.join(System.lineSeparator(), "2", "Buy milk", "0") + System.lineSeparator();
+
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        String output = out.toString(StandardCharsets.UTF_8);
+
+        assertEquals(1, fakeUseCase.getCreateTaskCalls());
+        assertEquals("Buy milk", fakeUseCase.getLastCreatedTitle());
+        assertEquals(1, fakeUseCase.getTaskCount());
+        assertTrue(fakeUseCase.containsTaskWithTitle("Buy milk"));
+        assertTrue(output.contains("New task successfully created."));
+    }
+
     static class FakeTaskUseCase implements TaskUseCase
     {
         private final Map<UUID, Task> storage = new HashMap<>();
@@ -111,6 +135,9 @@ class TaskCLIAdapterTest
 
         private UUID lastRenameId;
         private String lastRenameTitle;
+
+        private  int createTaskCalls = 0;
+        private String lastCreatedTitle;
 
         Task seedTask(String title)
         {
@@ -134,6 +161,25 @@ class TaskCLIAdapterTest
             return lastRenameTitle;
         }
 
+        int getCreateTaskCalls()
+        {
+            return createTaskCalls;
+        }
+
+        int getTaskCount()
+        {
+            return storage.size();
+        }
+
+        boolean containsTaskWithTitle(String title)
+        {
+            return storage.values().stream().anyMatch(task -> task.getTitle().equals(title));
+        }
+
+        String getLastCreatedTitle()
+        {
+            return lastCreatedTitle;
+        }
 
         @Override
         public Task renameTask(UUID id, String newTitle)
@@ -181,6 +227,9 @@ class TaskCLIAdapterTest
         @Override
         public Task createTask(String title)
         {
+            createTaskCalls++;
+            lastCreatedTitle = title;
+
             Task task = new Task(title);
             storage.put(task.getId(), task);
             return task;
@@ -222,5 +271,6 @@ class TaskCLIAdapterTest
         {
             throw new UnsupportedOperationException("Not needed in this test");
         }
+
     }
 }
