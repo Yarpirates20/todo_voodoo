@@ -132,7 +132,7 @@ class TaskCLIAdapterTest
         Task seeded = fakeUseCase.seedTask("Pay bills");
 
         String input =
-                String.join(System.lineSeparator(),"3", seeded.getId().toString(),"0") + System.lineSeparator();
+                String.join(System.lineSeparator(), "3", seeded.getId().toString(), "0") + System.lineSeparator();
 
         System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 
@@ -171,7 +171,33 @@ class TaskCLIAdapterTest
         assertEquals(1, fakeUseCase.getPostponeTaskCalls());
         assertEquals(seeded.getId(), fakeUseCase.getLastPostponedTaskId());
         assertEquals("2026-12-31", fakeUseCase.getLastPostponedDate());
-        assertEquals("2026-12-31", fakeUseCase.getTaskById(seeded.getId()).getDueDate());
+        assertEquals("2026-12-31", fakeUseCase.getTaskById(seeded.getId()).getDueDate().toString());
+    }
+
+    @Test
+    void runDeleteTaskCallsDeleteTaskAndPrintsSuccessMessage()
+    {
+        Task seeded = fakeUseCase.seedTask("Clean kitchen");
+
+        String input = String.join(System.lineSeparator(),
+                "6",
+                seeded.getId().toString(),
+                "0") + System.lineSeparator();
+
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
+        adapter = new TaskCLIAdapter(fakeUseCase);
+        adapter.run();
+
+        String output = out.toString(StandardCharsets.UTF_8);
+
+        assertEquals(1, fakeUseCase.getDeleteTaskCalls());
+        assertEquals(seeded.getId(), fakeUseCase.getLastDeletedTaskId());
+        assertEquals(0, fakeUseCase.getTaskCount());
+        assertTrue(output.contains("Task deleted successfully."));
     }
 
     static class FakeTaskUseCase implements TaskUseCase
@@ -184,7 +210,7 @@ class TaskCLIAdapterTest
         private UUID lastRenameId;
         private String lastRenameTitle;
 
-        private  int createTaskCalls = 0;
+        private int createTaskCalls = 0;
         private String lastCreatedTitle;
 
         private int completeTaskCalls = 0;
@@ -193,6 +219,19 @@ class TaskCLIAdapterTest
         private int postponeTaskCalls = 0;
         private UUID lastPostponedTaskId;
         private String lastPostponedDate;
+
+        private int deleteTaskCalls = 0;
+        private UUID lastDeletedTaskId;
+
+        public int getDeleteTaskCalls()
+        {
+            return deleteTaskCalls;
+        }
+
+        public UUID getLastDeletedTaskId()
+        {
+            return lastDeletedTaskId;
+        }
 
         Task seedTask(String title)
         {
@@ -318,6 +357,8 @@ class TaskCLIAdapterTest
         @Override
         public void deleteTask(UUID id)
         {
+            deleteTaskCalls++;
+            lastDeletedTaskId = id;
             storage.remove(id);
         }
 

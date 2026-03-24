@@ -77,13 +77,26 @@ public class TaskCLIAdapter
             case 5:
                 handlePostponeTask();
                 break;
-//            case 6:
-//                handle deleteTask();
-//                break;
+            case 6:
+                handleDeleteTask();
+                break;
             default:
                 System.out.println("Invalid command");
                 break;
         }
+    }
+
+    /**
+     * Retrieves UUID of a task from user and passes on to task service to delete.
+     */
+    private void handleDeleteTask()
+    {
+        System.out.println("Enter the UUID of the task to delete: ");
+        String idInput = scanner.nextLine();
+        UUID id = UUID.fromString(idInput);
+
+        taskService.deleteTask(id);
+        System.out.println("Task deleted successfully.");
     }
 
     /**
