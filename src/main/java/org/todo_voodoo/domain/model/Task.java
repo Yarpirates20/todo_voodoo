@@ -1,5 +1,6 @@
 package org.todo_voodoo.domain.model;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class Task
     private UUID id;
     private String title;
     private String description;
-    private String dueDate;        // YYYY-MM-DD
+    private LocalDate dueDate;        // YYYY-MM-DD
     private int categoryId;
     private boolean isCompleted;
 
@@ -27,7 +28,8 @@ public class Task
      * @param categoryId  ID of category of task.
      * @param isCompleted Boolean determining if task is active or finished.
      */
-    public Task(UUID id, String title, String description, String dueDate, int categoryId, boolean isCompleted)
+    public Task(UUID id, String title, String description, LocalDate dueDate, int categoryId,
+                boolean isCompleted)
     {
         if (title == null || title.isBlank())
         {
@@ -77,7 +79,7 @@ public class Task
      *
      * @return String representing Due Date.
      */
-    public String getDueDate()
+    public LocalDate getDueDate()
     {
         return dueDate;
     }
@@ -160,7 +162,7 @@ public class Task
      */
     public void updateDueDate(String newDate)
     {
-        this.dueDate = newDate;
+        this.dueDate = LocalDate.parse(newDate);
     }
 
     /**
