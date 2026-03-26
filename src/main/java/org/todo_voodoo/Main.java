@@ -5,23 +5,27 @@ import org.todo_voodoo.domain.model.Task;
 import org.todo_voodoo.domain.ports.in.TaskUseCase;
 import org.todo_voodoo.domain.ports.out.TaskRepository;
 import org.todo_voodoo.domain.service.TaskService;
+import org.todo_voodoo.infrastructure.adapters.in.console.TaskCLIAdapter;
 import org.todo_voodoo.infrastructure.adapters.out.persistance.InMemoryTaskRepository;
 
 public class Main
 {
     public static void main(String[] args)
     {
-        // Create the tool (Adapter)
+        // Create repository + service
         TaskRepository taskRepo = new InMemoryTaskRepository();
-
-        // Create brain (Service) and give it the Tool
         TaskUseCase taskService = new TaskService(taskRepo);
 
+
+        // Demo
         System.out.println("--- Starting To-Do Voodoo Test ---");
 
         // Use the Service
         Task testTask = taskService.createTask("Start my Stats homework");
         System.out.println("Created Task: " + testTask.getTitle() + " with ID: " + testTask.getId());
+
+
+
 
         // Rename Task
         taskService.renameTask(testTask.getId(), "Rename my Stats homework");
@@ -34,6 +38,8 @@ public class Main
         System.out.println("Total Tasks in System: " + taskService.getAllTasks().size());
 
 
+        TaskCLIAdapter cli = new TaskCLIAdapter(taskService);
+        cli.run();
 
     }
 }
